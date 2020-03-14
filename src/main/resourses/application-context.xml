@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   		 http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- Activates @Autowired -->
+	<context:annotation-config />
+
+	<context:component-scan base-package="JpaImplementation" />
+	<mvc:annotation-driven/>
+	<tx:annotation-driven/>
+
+
+	<mvc:view-controller path="/" view-name="page_one"/>
+
+	<bean id="resolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+	<bean id="localContainerEntityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+		<property name="packagesToScan" value="JpaImplementation"/>
+		<property name="jpaVendorAdapter">
+		    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		       <property name="showSql" value="true"/>
+	           <property name="generateDdl" value="true"/>
+	           <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"/>
+		    </bean>
+		</property>
+	</bean>
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/hibernate?useUnicode=true&amp;serverTimezone=UTC" />
+		<property name="username" value="root" />
+		<property name="password" value="123" />
+	</bean>
+	<bean id="bookDaoImpl" class="JpaImplementation.JpaDAO.JpaDao" />
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+	<tx:annotation-driven />
+	<bean id="transactionManager"
+		  class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="localContainerEntityManagerFactory"/>
+	</bean>
+
+</beans>
